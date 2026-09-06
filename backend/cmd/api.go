@@ -1,17 +1,20 @@
 package main
 
 import (
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/Xav147/flashcards_backend/internal/flashcards"
+	"github.com/Xav147/flashcards_backend/internal/mongodb"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 type application struct {
 	config config
-	// logger
-	// db driver
+	db     *mongo.Client
 }
 
 func (app *application) mount() http.Handler {
@@ -28,6 +31,12 @@ func (app *application) mount() http.Handler {
 		w.Write([]byte("Up!"))
 	})
 
+	collection := app.db.Database("flashcards-db").Collection("decks")
+	mongodbRepo := mongodb.CreateNewMongoDbRepo(collection)
+	flashcardsService := flashcards.NewService(mongodbRepo)
+	flashcardsHandler := flashcards.NewHandler(flashcardsService)
+	r.Get("/list_decks", flashcardsHandler.ListDecks)
+
 	//http.ListenAndServe(":3333",r)
 
 	return r
@@ -42,7 +51,7 @@ func (app *application) run(h http.Handler) error {
 		IdleTimeout:  time.Minute,
 	}
 
-	log.Println("server has started at addr %s", app.config.addr)
+	log.Printf("server has started at addr %s", app.config.addr)
 
 	return srv.ListenAndServe()
 }
