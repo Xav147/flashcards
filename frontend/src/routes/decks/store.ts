@@ -7,4 +7,6 @@ export type Deck = {
 
 export const apiData = writable<Deck[]>([]);
 
-export const deckNamesStore = derived(apiData, ($apiData) => $apiData.map((deck) => [deck.name, deck.size]));
+export const deckNamesStore = derived(apiData, ($apiData) =>
+	$apiData.map((deck): [string, number] => [deck.name, deck.size])
+);

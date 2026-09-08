@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
+	import DeckRow from '$lib/components/layout/DeckRow.svelte';
 	import { onMount } from 'svelte';
 	import { apiData, deckNamesStore } from './store';
 	onMount(async () => {
@@ -17,7 +18,7 @@
 </script>
 
 <svelte:head>
-	<title>Flashcards Home</title>
+	<title>Flashcards - Decks</title>
 </svelte:head>
 
 <div class="min-h-screen bg-stone-100 px-6 py-16 text-stone-900">
@@ -29,9 +30,9 @@
 		</div>
 
 		<div class="space-y-5 rounded-3xl border border-stone-200 bg-white p-6 shadow-sm">
-			<ul>
-				{#each $deckNamesStore as deckName (deckName)}
-					<li>{deckName[0]} - Cards: {deckName[1]}</li>
+			<ul class="space-y-2">
+				{#each $deckNamesStore as deck (deck)}
+					<li><DeckRow deckName={deck[0]} deckSize={deck[1]} /></li>
 				{/each}
 			</ul>
 
