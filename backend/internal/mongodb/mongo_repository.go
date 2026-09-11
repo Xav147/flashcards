@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"github.com/Xav147/flashcards_backend/internal/flashcards"
@@ -43,4 +44,24 @@ func (repo *MongodbRepo) ListDecks(ctx context.Context) ([]flashcards.Deck, erro
 	slog.Info("Found multiple decks")
 
 	return results, nil
+}
+
+func (repo *MongodbRepo) CreateDeck(ctx context.Context, deck flashcards.Deck) error {
+	filter := bson.D{{Key: "name", Value: deck.Name}}
+	var existingDeck flashcards.Deck
+	err := repo.collection.FindOne(ctx, filter).Decode(&existingDeck)
+	if err == nil {
+		slog.Error("Deck already present, skipping")
+		return fmt.Errorf("%w: %q", flashcards.ErrDeckAlreadyExists, deck.Name)
+	}
+	if err != mongo.ErrNoDocuments {
+		return err
+	}
+	_, err = repo.collection.InsertOne(ctx, deck)
+	if err != nil {
+		slog.Error("Could not insert deck in collection")
+		return fmt.Errorf("Could not add deck %q", deck.Name)
+	}
+	slog.Info("Added deck to collection")
+	return nil
 }

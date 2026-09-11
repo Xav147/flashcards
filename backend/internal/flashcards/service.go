@@ -6,6 +6,7 @@ import (
 
 type Service interface {
 	ListDecks(ctx context.Context) ([]Deck, error)
+	CreateDeck(ctx context.Context, deck Deck) error
 }
 
 type svc struct {
@@ -25,4 +26,12 @@ func (s *svc) ListDecks(ctx context.Context) ([]Deck, error) {
 		return nil, err
 	}
 	return decks, nil
+}
+
+func (s *svc) CreateDeck(ctx context.Context, deck Deck) error {
+	err := s.repository.CreateDeck(ctx, deck)
+	if err != nil {
+		return err
+	}
+	return nil
 }

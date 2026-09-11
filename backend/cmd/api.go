@@ -36,6 +36,7 @@ func (app *application) mount() http.Handler {
 	flashcardsService := flashcards.NewService(mongodbRepo)
 	flashcardsHandler := flashcards.NewHandler(flashcardsService)
 	r.Get("/list_decks", flashcardsHandler.ListDecks)
+	r.Post("/create_deck", flashcardsHandler.CreateDeck)
 
 	//http.ListenAndServe(":3333",r)
 
