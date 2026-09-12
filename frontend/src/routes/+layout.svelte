@@ -9,7 +9,7 @@
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 <div>
-    <Navbar />
+	<Navbar />
 </div>
 <Toaster richColors />
 {@render children()}
